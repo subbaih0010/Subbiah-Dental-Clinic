@@ -22,7 +22,7 @@ const Dashboard = () => {
   // live data from backend
   const [patients, setPatients] = useState([]);
   const [prescriptions, setPrescriptions] = useState([]);
-const API_BASE = 'http://localhost:5000';
+const API_BASE = 'https://subbiah-dental-clinic.onrender.com';
 
   useEffect(() => {
     const load = async () => {

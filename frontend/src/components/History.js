@@ -17,7 +17,7 @@ const History = () => {
   const [showBackgroundAnimation, setShowBackgroundAnimation] = useState(true);
   const [animatedRows, setAnimatedRows] = useState([]);
 
-  const API_BASE = 'http://localhost:5000';
+  const API_BASE = 'https://subbiah-dental-clinic.onrender.com';
   const [historyData, setHistoryData] = useState([]);
 
   useEffect(() => {

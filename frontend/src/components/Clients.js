@@ -22,7 +22,7 @@ const Clients = () => {
   const [editDistrictSearch, setEditDistrictSearch] = useState('');
   
   const [clients, setClients] = useState([]);
-  const API_BASE = 'http://localhost:5000';
+  const API_BASE = 'https://subbiah-dental-clinic.onrender.com';
 
   // Load patients from backend and map patientId -> id for UI compatibility
   useEffect(() => {
