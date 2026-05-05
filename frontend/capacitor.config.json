@@ -1,0 +1,6 @@
+{
+  "appId": "com.subiahdental.clinic",
+  "appName": "Subbiah Dental Clinic",
+  "webDir": "build",
+  "bundledWebRuntime": false
+}
