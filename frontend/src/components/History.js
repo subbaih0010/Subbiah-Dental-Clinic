@@ -109,6 +109,26 @@ const History = () => {
     .filter(h => (h.date || '').startsWith(thisMonthKey))
     .reduce((s, r) => s + (r.total || 0), 0);
 
+  // Format amounts to compact notation (K, L, C)
+  const formatAmount = (num) => {
+    if (num === null || num === undefined || num === '') return '0';
+    const val = Number(num);
+    if (isNaN(val)) return String(num);
+    const abs = Math.abs(val);
+    const sign = val < 0 ? '-' : '';
+
+    if (abs >= 10000000) {
+      return `${sign}${(abs / 10000000).toFixed(2).replace(/\.?0+$/, '')}C`;
+    }
+    if (abs >= 100000) {
+      return `${sign}${(abs / 100000).toFixed(2).replace(/\.?0+$/, '')}L`;
+    }
+    if (abs >= 1000) {
+      return `${sign}${(abs / 1000).toFixed(1).replace(/\.0$/, '')}K`;
+    }
+    return `${sign}${abs.toLocaleString('en-IN')}`;
+  };
+
   useEffect(() => {
     // Animate table rows when data changes
     const timer = setTimeout(() => {
@@ -865,70 +885,116 @@ const History = () => {
 
         /* ==== RESPONSIVE STYLES ==== */
         @media (max-width: 768px) {
-          /* Main container padding */
-          .history-container > div {
-            padding: 15px !important;
+          /* Main container padding - full width, no side margins */
+          .history-container > div:not(.animated-bg),
+          .history-content-wrap {
+            padding: 8px 4px 60px 4px !important;
           }
 
-          /* Stats cards stack on mobile */
+          .history-container .container-fluid {
+            padding-left: 4px !important;
+            padding-right: 4px !important;
+          }
+
+          /* Stats cards on mobile - 2 side-by-side, 1 below */
           .stat-card-enter {
             animation-delay: 0s !important;
           }
-          
-          .table-container {
-            padding: 20px 15px;
-            overflow-x: auto;
+
+          .glass-card .p-4 {
+            padding: 12px 10px !important;
           }
           
-          /* Filter section - vertical layout on mobile */
+          .glass-card h3 {
+            font-size: 1.35rem !important;
+            margin: 2px 0 !important;
+          }
+
+          .glass-card p {
+            font-size: 0.75rem !important;
+            margin-bottom: 2px !important;
+            line-height: 1.1 !important;
+          }
+
+          .stat-icon-box {
+            width: 36px !important;
+            height: 36px !important;
+            border-radius: 10px !important;
+            flex-shrink: 0 !important;
+          }
+
+          .stat-icon-box svg {
+            width: 18px !important;
+            height: 18px !important;
+          }
+          
+          /* Filter section on mobile */
           .filter-section {
-            padding: 20px;
+            padding: 12px 10px !important;
+            border-radius: 16px !important;
+            margin-bottom: 16px !important;
           }
           
-          .filter-section .d-flex {
-            flex-direction: column;
-            align-items: flex-start !important;
-            gap: 12px;
+          .filter-section-header {
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 10px !important;
           }
-          
+
+          .filter-section-title {
+            font-size: 0.95rem !important;
+            margin: 0 !important;
+          }
+
           .btn-clear {
-            width: 100%;
-            text-align: center;
+            width: auto !important;
+            padding: 4px 12px !important;
+            font-size: 0.8rem !important;
           }
           
-          /* Form inputs stack */
-          .filter-section .row {
-            margin-top: 15px;
+          .modern-input {
+            padding: 8px 10px !important;
+            font-size: 0.85rem !important;
+            border-radius: 10px !important;
           }
-          
-          .filter-section .col-md-4,
-          .filter-section .col-md-3,
-          .filter-section .col-md-2 {
-            margin-bottom: 12px;
-          }
-          
+
           .btn-apply {
-            width: 100%;
+            padding: 8px 10px !important;
+            font-size: 0.85rem !important;
+            border-radius: 10px !important;
+            width: 100% !important;
           }
           
-          /* Table responsive - horizontal scroll */
+          /* Table responsive - ONLY table data scrolls horizontally */
+          .table-container {
+            padding: 10px 6px !important;
+            border-radius: 16px !important;
+            overflow-x: visible !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+          }
+
           .table-responsive {
-            overflow-x: auto;
+            overflow-x: auto !important;
             -webkit-overflow-scrolling: touch;
+            width: 100% !important;
+            margin: 0 !important;
           }
           
           .table {
-            min-width: 800px;
+            min-width: 650px;
           }
           
           .table-header-gradient th {
-            padding: 12px 10px !important;
-            font-size: 0.7rem;
+            padding: 10px 8px !important;
+            font-size: 0.72rem !important;
           }
           
           .table-row-modern td {
-            padding: 12px 10px;
-            font-size: 0.8rem;
+            padding: 10px 8px !important;
+            font-size: 0.82rem !important;
           }
           
           /* Action buttons smaller on mobile */
@@ -937,14 +1003,22 @@ const History = () => {
           }
           
           .btn-action svg {
-            width: 12px;
-            height: 12px;
+            width: 14px;
+            height: 14px;
           }
           
           /* Pagination responsive */
+          .pagination-modern {
+            flex-wrap: wrap !important;
+            justify-content: center !important;
+            gap: 4px !important;
+            margin-top: 15px !important;
+            max-width: 100% !important;
+          }
+
           .pagination-modern .page-link {
-            padding: 6px 10px;
-            font-size: 0.8rem;
+            padding: 6px 10px !important;
+            font-size: 0.8rem !important;
           }
           
           .d-flex.justify-content-between.align-items-center.mt-4 {
@@ -955,75 +1029,38 @@ const History = () => {
           
           /* Modal adjustments */
           .modal-dialog {
-            margin: 10px;
+            margin: 8px !important;
+            max-width: calc(100% - 16px) !important;
           }
           
           .modal-body {
-            padding: 20px !important;
+            padding: 16px 12px !important;
           }
           
           .modal-header-gradient {
-            padding: 16px;
+            padding: 14px 16px !important;
           }
           
           .modal-title {
-            font-size: 1.1rem;
+            font-size: 1.1rem !important;
           }
           
           /* Info cards in modal */
           .info-card, .payment-card, .remarks-card {
-            padding: 15px;
-          }
-          
-          .info-card .mb-2, .payment-card .mb-2 {
-            flex-direction: column;
-            gap: 5px;
-          }
-          
-          .info-card .mb-2 span:first-child,
-          .payment-card .mb-2 span:first-child {
-            width: 100%;
-          }
-          
-          /* Stats cards */
-          .glass-card .p-4 {
-            padding: 20px !important;
-          }
-          
-          .glass-card h3 {
-            font-size: 1.5rem !important;
-          }
-          
-          .glass-card p {
-            font-size: 0.8rem;
-          }
-          
-          .stat-icon-box {
-            width: 45px;
-            height: 45px;
-          }
-          
-          /* Page header */
-          .mb-4 h2 {
-            font-size: 1.5rem !important;
-            flex-wrap: wrap;
-          }
-          
-          .mb-4 p {
-            font-size: 0.9rem;
+            padding: 12px;
           }
           
           /* Background toggle button position */
           .bg-toggle {
-            bottom: 20px;
-            right: 20px;
-            width: 45px;
-            height: 45px;
+            bottom: 16px !important;
+            right: 16px !important;
+            width: 38px !important;
+            height: 38px !important;
           }
           
           .bg-toggle svg {
-            width: 20px;
-            height: 20px;
+            width: 18px !important;
+            height: 18px !important;
           }
         }
         
@@ -1051,7 +1088,6 @@ const History = () => {
             font-size: 0.85rem;
           }
           
-          /* Stats cards on tablet - 2 columns, 1 full width on smaller tablets */
           .row.g-4 {
             --bs-gutter-y: 1rem;
           }
@@ -1075,12 +1111,17 @@ const History = () => {
         
         /* Extra small devices */
         @media (max-width: 480px) {
+          .history-container > div:not(.animated-bg),
+          .history-content-wrap {
+            padding: 8px 4px 60px 4px !important;
+          }
+
           .table-container {
-            padding: 15px 12px;
+            padding: 10px 6px !important;
           }
           
           .filter-section {
-            padding: 15px;
+            padding: 10px !important;
           }
           
           .glass-card h3 {
@@ -1088,19 +1129,19 @@ const History = () => {
           }
           
           .modal-header-gradient {
-            padding: 12px 16px;
+            padding: 12px 14px;
           }
           
           .info-card, .payment-card, .remarks-card {
-            padding: 12px;
+            padding: 10px;
           }
           
           .payment-card .d-flex.justify-content-between {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
           }
           
           .btn-print-modal, .btn-apply {
-            padding: 10px 16px;
+            padding: 8px 12px;
             font-size: 0.85rem;
           }
         }
@@ -1109,10 +1150,6 @@ const History = () => {
         @media (max-width: 768px) and (orientation: landscape) {
           .history-container > div {
             padding: 10px !important;
-          }
-          
-          .filter-section .row {
-            margin-top: 10px;
           }
           
           .modal-dialog {
@@ -1127,7 +1164,7 @@ const History = () => {
 
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <div style={{ marginLeft: '0', padding: '30px', position: 'relative', zIndex: 1 }}>
+      <div style={{ marginLeft: '0', padding: '30px', position: 'relative', zIndex: 1 }} className="history-content-wrap fade-in">
         <Container fluid>
           {/* Alert */}
           {alert.show && (
@@ -1168,9 +1205,9 @@ const History = () => {
             <p style={{ color: '#64748b', fontSize: '1.1rem' }}>View and manage patient billing history, payments, and treatment records</p>
           </div> */}
 
-          {/* Stats Cards */}
-          <Row className="g-4 mb-4">
-            <Col xs={12} sm={6} lg={4} className="stat-card-enter" style={{ animationDelay: '0.1s' }}>
+          {/* Stats Cards - responsive grid: Card 1 & 2 in same row, Card 3 below on mobile */}
+          <Row className="g-2 g-md-4 mb-3 mb-md-4">
+            <Col xs={6} sm={6} lg={4} className="stat-card-enter" style={{ animationDelay: '0.1s' }}>
               <Card className="glass-card h-100" style={{ border: 'none' }}>
                 <Card.Body className="p-4">
                   <div className="d-flex justify-content-between align-items-start">
@@ -1196,20 +1233,25 @@ const History = () => {
               </Card>
             </Col>
 
-            <Col xs={12} sm={6} lg={4} className="stat-card-enter" style={{ animationDelay: '0.2s' }}>
+            <Col xs={6} sm={6} lg={4} className="stat-card-enter" style={{ animationDelay: '0.2s' }}>
               <Card className="glass-card h-100" style={{ border: 'none' }}>
                 <Card.Body className="p-4">
                   <div className="d-flex justify-content-between align-items-start">
                     <div>
                       <p style={{ color: '#64748b', marginBottom: '8px', fontSize: '0.9rem', fontWeight: 500 }}>Total Revenue</p>
-                      <h3 style={{
-                        background: 'linear-gradient(180deg, #10b981 0%, #34d399 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        fontWeight: 800,
-                        fontSize: '2rem',
-                        margin: 0
-                      }}>₹{totalRevenue.toLocaleString()}</h3>
+                      <h3
+                        style={{
+                          background: 'linear-gradient(180deg, #10b981 0%, #34d399 100%)',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                          fontWeight: 800,
+                          fontSize: '2rem',
+                          margin: 0
+                        }}
+                        title={`₹${totalRevenue.toLocaleString('en-IN')}`}
+                      >
+                        ₹{formatAmount(totalRevenue)}
+                      </h3>
                     </div>
                     <div className="stat-icon-box" style={{
                       background: 'rgba(16, 185, 129, 0.1)',
@@ -1222,20 +1264,25 @@ const History = () => {
               </Card>
             </Col>
 
-            <Col xs={12} sm={6} lg={4} className="stat-card-enter" style={{ animationDelay: '0.3s' }}>
+            <Col xs={12} sm={12} lg={4} className="stat-card-enter" style={{ animationDelay: '0.3s' }}>
               <Card className="glass-card h-100" style={{ border: 'none' }}>
                 <Card.Body className="p-4">
                   <div className="d-flex justify-content-between align-items-start">
                     <div>
                       <p style={{ color: '#64748b', marginBottom: '8px', fontSize: '0.9rem', fontWeight: 500 }}>This Month Collection</p>
-                      <h3 style={{
-                        background: 'linear-gradient(180deg, #0077b6 0%, #00b4d8 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        fontWeight: 800,
-                        fontSize: '2rem',
-                        margin: 0
-                      }}>₹{thisMonthCollection.toLocaleString()}</h3>
+                      <h3
+                        style={{
+                          background: 'linear-gradient(180deg, #0077b6 0%, #00b4d8 100%)',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                          fontWeight: 800,
+                          fontSize: '2rem',
+                          margin: 0
+                        }}
+                        title={`₹${thisMonthCollection.toLocaleString('en-IN')}`}
+                      >
+                        ₹{formatAmount(thisMonthCollection)}
+                      </h3>
                     </div>
                     <div className="stat-icon-box" style={{
                       background: 'rgba(0, 119, 182, 0.1)',
@@ -1249,25 +1296,25 @@ const History = () => {
             </Col>
           </Row>
 
-          {/* Filters Section */}
-          <div className="filter-section mb-4">
-            <div className="d-flex justify-content-between align-items-center mb-3" style={{ position: 'relative', zIndex: 10 }}>
-              <h5 className="m-0 text-white" style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* Filters Section - responsive 2 rows on mobile */}
+          <div className="filter-section mb-3 mb-md-4">
+            <div className="filter-section-header d-flex justify-content-between align-items-center mb-2 mb-md-3" style={{ position: 'relative', zIndex: 10 }}>
+              <h5 className="filter-section-title m-0 text-white" style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Icons.Filter /> Filter Records
               </h5>
               <button className="btn-clear" onClick={clearFilters}>
                 Clear All
               </button>
             </div>
-            <Row className="g-3" style={{ position: 'relative', zIndex: 10 }}>
-              <Col xs={12} md={4}>
+            <Row className="g-2 g-md-3" style={{ position: 'relative', zIndex: 10 }}>
+              <Col xs={7} sm={6} md={4}>
                 <InputGroup>
-                  <InputGroup.Text style={{ background: 'white', border: 'none', padding: '0 16px', borderRadius: '12px 0 0 12px' }}>
+                  <InputGroup.Text style={{ background: 'white', border: 'none', padding: '0 10px', borderRadius: '12px 0 0 12px' }}>
                     <Icons.Search />
                   </InputGroup.Text>
                   <Form.Control
                     type="text"
-                    placeholder="Search by patient, ID, bill no, mobile..."
+                    placeholder="Search patient, ID, bill..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="modern-input"
@@ -1275,7 +1322,7 @@ const History = () => {
                   />
                 </InputGroup>
               </Col>
-              <Col xs={12} sm={6} md={3}>
+              <Col xs={5} sm={6} md={3}>
                 <Form.Select
                   value={monthFilter}
                   onChange={(e) => setMonthFilter(e.target.value)}
@@ -1284,12 +1331,12 @@ const History = () => {
                   <option value="">All Months</option>
                   {uniqueMonths.map(month => (
                     <option key={month} value={month}>
-                      {new Date(month + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                      {new Date(month + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                     </option>
                   ))}
                 </Form.Select>
               </Col>
-              <Col xs={12} sm={6} md={3}>
+              <Col xs={7} sm={8} md={3}>
                 <Form.Select
                   value={diagnosisFilter}
                   onChange={(e) => setDiagnosisFilter(e.target.value)}
@@ -1301,7 +1348,7 @@ const History = () => {
                   ))}
                 </Form.Select>
               </Col>
-              <Col xs={12} md={2}>
+              <Col xs={5} sm={4} md={2}>
                 <button className="btn-apply w-100">
                   Apply Filters
                 </button>
@@ -1344,10 +1391,14 @@ const History = () => {
                         <small style={{ color: '#64748b', fontWeight: 500 }}>{record.clientId}</small>
                       </td>
                       <td style={{ color: '#475569', fontWeight: 600 }}>{record.diagnosis || '-'}</td>
-                      <td style={{ fontWeight: 700, color: '#059669', fontSize: '1.05rem', textAlign: 'center' }}>₹{record.fee}</td>
-                      <td style={{ fontWeight: 700, color: '#16a34a', fontSize: '1.05rem', textAlign: 'center' }}>₹{record.receivedAmount}</td>
-                      <td style={{ fontWeight: 700, color: record.balance > 0 ? '#dc2626' : '#059669', fontSize: '1.05rem', textAlign: 'center' }}>
-                        ₹{record.balance}
+                      <td style={{ fontWeight: 700, color: '#059669', fontSize: '1.05rem', textAlign: 'center' }} title={`₹${Number(record.fee || 0).toLocaleString('en-IN')}`}>
+                        ₹{formatAmount(record.fee)}
+                      </td>
+                      <td style={{ fontWeight: 700, color: '#16a34a', fontSize: '1.05rem', textAlign: 'center' }} title={`₹${Number(record.receivedAmount || 0).toLocaleString('en-IN')}`}>
+                        ₹{formatAmount(record.receivedAmount)}
+                      </td>
+                      <td style={{ fontWeight: 700, color: record.balance > 0 ? '#dc2626' : '#059669', fontSize: '1.05rem', textAlign: 'center' }} title={`₹${Number(record.balance || 0).toLocaleString('en-IN')}`}>
+                        ₹{formatAmount(record.balance)}
                       </td>
                       <td>
                         <div className="d-flex justify-content-center gap-2">
@@ -1506,16 +1557,16 @@ const History = () => {
                 </h6>
                 <div className="d-flex justify-content-between mb-2 flex-wrap" style={{ gap: '5px' }}>
                   <span style={{ color: '#64748b' }}>Fee:</span>
-                  <span style={{ fontWeight: 600 }}>₹{selectedRecord.fee}</span>
+                  <span style={{ fontWeight: 600 }} title={`₹${Number(selectedRecord.fee || 0).toLocaleString('en-IN')}`}>₹{formatAmount(selectedRecord.fee)}</span>
                 </div>
                 <div className="d-flex justify-content-between mb-2 flex-wrap" style={{ gap: '5px' }}>
                   <span style={{ color: '#64748b' }}>Received Amount:</span>
-                  <span style={{ fontWeight: 600, color: '#16a34a' }}>₹{selectedRecord.receivedAmount}</span>
+                  <span style={{ fontWeight: 600, color: '#16a34a' }} title={`₹${Number(selectedRecord.receivedAmount || 0).toLocaleString('en-IN')}`}>₹{formatAmount(selectedRecord.receivedAmount)}</span>
                 </div>
                 <hr style={{ borderColor: 'rgba(16, 185, 129, 0.2)' }} />
                 <div className="d-flex justify-content-between flex-wrap" style={{ fontWeight: 700, fontSize: '1.2rem', gap: '5px' }}>
                   <span style={{ color: '#1e293b' }}>Balance:</span>
-                  <span style={{ color: selectedRecord.balance > 0 ? '#dc2626' : '#059669' }}>₹{selectedRecord.balance}</span>
+                  <span style={{ color: selectedRecord.balance > 0 ? '#dc2626' : '#059669' }} title={`₹${Number(selectedRecord.balance || 0).toLocaleString('en-IN')}`}>₹{formatAmount(selectedRecord.balance)}</span>
                 </div>
               </div>
 

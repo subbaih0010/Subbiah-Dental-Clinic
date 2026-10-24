@@ -40,17 +40,20 @@ const Clients = () => {
   }, []);
 
   // Open Add modal and fetch next patient id to display
-  const handleOpenAddModal = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/api/patients/next-id`);
-      const data = await res.json();
-      const nextId = data?.nextId || '';
-      setNewClient(prev => ({ ...prev, id: nextId, patientId: nextId }));
-      setShowAddModal(true);
-    } catch (err) {
-      console.error('Failed to fetch next patient id', err);
-      setShowAddModal(true);
-    }
+  const handleOpenAddModal = () => {
+    setShowAddModal(true);
+    setNewClient(prev => ({ ...prev, id: 'Loading...', patientId: '' }));
+
+    fetch(`${API_BASE}/api/patients/next-id`)
+      .then(res => res.json())
+      .then(data => {
+        const nextId = data?.nextId || '';
+        setNewClient(prev => ({ ...prev, id: nextId, patientId: nextId }));
+      })
+      .catch(err => {
+        console.error('Failed to fetch next patient id', err);
+        setNewClient(prev => ({ ...prev, id: '', patientId: '' }));
+      });
   };
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -118,6 +121,26 @@ const Clients = () => {
   const pendingPatients = clients.filter(c => (c.balance || 0) > 0);
   const pendingCount = pendingPatients.length;
   const pendingAmount = pendingPatients.reduce((sum, c) => sum + (c.balance || 0), 0);
+
+  // Format amounts to compact notation (K, L, C)
+  const formatAmount = (num) => {
+    if (num === null || num === undefined || num === '') return '0';
+    const val = Number(num);
+    if (isNaN(val)) return String(num);
+    const abs = Math.abs(val);
+    const sign = val < 0 ? '-' : '';
+
+    if (abs >= 10000000) {
+      return `${sign}${(abs / 10000000).toFixed(2).replace(/\.?0+$/, '')}C`;
+    }
+    if (abs >= 100000) {
+      return `${sign}${(abs / 100000).toFixed(2).replace(/\.?0+$/, '')}L`;
+    }
+    if (abs >= 1000) {
+      return `${sign}${(abs / 1000).toFixed(1).replace(/\.0$/, '')}K`;
+    }
+    return `${sign}${abs.toLocaleString('en-IN')}`;
+  };
 
   // Get the data to display based on table view
   const getDisplayData = () => {
@@ -407,15 +430,49 @@ const Clients = () => {
         .control-bar {
           background: linear-gradient(180deg, #0077b6 0%, #00b4d8 100%);
           border-radius: 20px;
-          padding: 20px 30px;
+          padding: 18px 24px;
           box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
           display: flex;
           align-items: center;
-          gap: 20px;
+          gap: 15px;
           flex-wrap: wrap;
           position: relative;
           overflow: hidden;
           animation: slideDown 0.6s ease-out;
+        }
+
+        .control-bar-row {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .control-bar-row-inputs {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          flex: 1;
+        }
+
+        .search-input-wrap {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex: 1;
+        }
+
+        .date-filter-wrap {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: white;
+        }
+
+        .control-bar-row-actions {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          margin-left: auto;
         }
 
         .control-bar::before {
@@ -781,9 +838,31 @@ const Clients = () => {
 
         /* ==== RESPONSIVE STYLES ==== */
         @media (max-width: 768px) {
-          /* Main container padding */
-          .modern-clients-container > div {
-            padding: 15px !important;
+          /* Full screen on mobile - remove empty side spaces */
+          .modern-clients-container {
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow-x: hidden !important;
+            box-sizing: border-box !important;
+          }
+
+          /* Main container padding - fit full mobile width */
+          .modern-clients-container > div:not(.animated-bg),
+          .clients-content-wrap {
+            padding: 10px 4px 60px 4px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            overflow-x: hidden !important;
+          }
+
+          .modern-clients-container .container-fluid {
+            padding-left: 2px !important;
+            padding-right: 2px !important;
+            margin: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow-x: hidden !important;
           }
 
           /* Stats cards stack on mobile */
@@ -793,117 +872,237 @@ const Clients = () => {
 
           /* Stats row - add top margin on mobile */
           .row.g-4.mb-4:first-of-type {
-            margin-top: 16px !important;
+            margin-top: 10px !important;
+          }
+
+          .row.g-4 {
+            --bs-gutter-x: 8px !important;
+            --bs-gutter-y: 10px !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+          }
+
+          .row.g-4 > [class*="col-"] {
+            padding-left: 4px !important;
+            padding-right: 4px !important;
           }
           
+          /* Modern Table Container - Must NOT scroll horizontally */
           .modern-table-container {
-            padding: 20px 15px;
-            overflow-x: auto;
+            padding: 14px 10px !important;
+            overflow-x: hidden !important;
+            border-radius: 16px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            margin: 0 !important;
           }
           
           .modern-table-container h4 {
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
+            font-size: 1.15rem !important;
+            margin-bottom: 0.85rem !important;
+            padding-left: 2px !important;
           }
           
-          /* Control bar - vertical layout on mobile */
+          /* Control bar on mobile - 2 rows */
           .control-bar {
-            flex-direction: column;
-            align-items: stretch;
-            padding: 20px;
-            gap: 12px;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            padding: 12px 10px !important;
+            gap: 10px !important;
+            border-radius: 16px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            margin-bottom: 16px !important;
           }
-          
+
+          .control-bar-row {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: 8px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+          }
+
+          /* Row 1: Search bar and Date filter in the SAME ROW */
+          .control-bar-row-inputs {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: 8px !important;
+            width: 100% !important;
+          }
+
+          .search-input-wrap {
+            flex: 1 1 54% !important;
+            min-width: 0 !important;
+            position: relative !important;
+            display: flex !important;
+            align-items: center !important;
+          }
+
           .control-bar .search-icon-wrapper {
-            display: none;
+            display: none !important;
           }
           
           .modern-search {
-            width: 100%;
-            min-width: auto;
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            font-size: 0.85rem !important;
+            padding: 10px 10px !important;
+            border-radius: 14px !important;
           }
           
-          .control-bar .d-flex.align-items-center.gap-2 {
-            width: 100%;
-            justify-content: space-between;
+          .date-filter-wrap {
+            flex: 1 1 46% !important;
+            min-width: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            color: white !important;
+            box-sizing: border-box !important;
+          }
+
+          .date-filter-wrap svg {
+            width: 16px !important;
+            height: 16px !important;
+            flex-shrink: 0 !important;
+          }
+
+          .modern-date-filter {
+            width: 100% !important;
+            min-width: 0 !important;
+            box-sizing: border-box !important;
+            font-size: 0.82rem !important;
+            padding: 10px 6px !important;
+            border-radius: 14px !important;
           }
           
-          .client-counter {
+          /* Row 2: Total patient and Add patient button in the SAME ROW */
+          .control-bar-row-actions {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: 8px !important;
+            width: 100% !important;
             margin-left: 0 !important;
-            margin-right: 0 !important;
+          }
+
+          .client-counter {
+            flex: 1 1 50% !important;
+            margin: 0 !important;
+            height: 46px !important;
+            box-sizing: border-box !important;
             text-align: center;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 20px;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            padding: 6px 12px !important;
+            border-radius: 14px !important;
+          }
+
+          .client-counter span {
+            font-size: 0.74rem !important;
+            line-height: 1.1 !important;
           }
           
           .client-counter div {
-            font-size: 1.2rem;
+            font-size: 1.15rem !important;
           }
           
           .btn-add-modern {
-            justify-content: center;
-            width: 100%;
-            padding: 12px;
+            flex: 1 1 50% !important;
+            justify-content: center !important;
+            height: 46px !important;
+            margin: 0 !important;
+            padding: 8px 10px !important;
+            border-radius: 14px !important;
+            box-sizing: border-box !important;
+            font-size: 0.88rem !important;
+            white-space: nowrap !important;
+          }
+
+          .btn-add-modern svg {
+            width: 16px !important;
+            height: 16px !important;
           }
           
-          /* Table responsive - horizontal scroll */
+          /* Table responsive - ONLY table data scrolls horizontally */
           .table-responsive {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            border-radius: 12px !important;
+            margin: 0 !important;
+            padding: 0 !important;
           }
           
           .table {
-            min-width: 800px;
+            min-width: 720px !important;
+            margin-bottom: 0 !important;
           }
           
           .table-header-gradient th {
             padding: 12px 10px !important;
-            font-size: 0.7rem;
+            font-size: 0.75rem !important;
+            white-space: nowrap !important;
           }
           
           .table-row-modern td {
-            padding: 12px 10px;
-            font-size: 0.8rem;
+            padding: 12px 10px !important;
+            font-size: 0.82rem !important;
+            white-space: nowrap !important;
           }
           
           /* Action buttons smaller on mobile */
           .btn-action {
-            padding: 6px 10px;
+            padding: 6px 10px !important;
           }
           
           .btn-action svg {
-            width: 12px;
-            height: 12px;
+            width: 14px !important;
+            height: 14px !important;
           }
           
           /* Pagination responsive */
+          .pagination-modern {
+            flex-wrap: wrap !important;
+            justify-content: center !important;
+            gap: 4px !important;
+            margin-top: 15px !important;
+            max-width: 100% !important;
+          }
+
           .pagination-modern .page-link {
-            padding: 6px 10px;
-            font-size: 0.8rem;
+            padding: 6px 10px !important;
+            font-size: 0.8rem !important;
           }
           
           /* Modal adjustments */
           .modal-dialog {
-            margin: 10px;
+            margin: 8px !important;
+            max-width: calc(100% - 16px) !important;
           }
           
           .modal-body {
-            padding: 20px !important;
+            padding: 16px 12px !important;
           }
           
           .modal-header-gradient {
-            padding: 16px;
+            padding: 14px 16px !important;
           }
           
           .modal-title {
-            font-size: 1.1rem;
+            font-size: 1.1rem !important;
           }
           
           /* Visit cards in view modal */
           .visit-card {
-            flex-direction: column;
+            flex-direction: column !important;
           }
           
           .visit-card > div {
@@ -912,29 +1111,47 @@ const Clients = () => {
           
           /* Form rows in modals */
           .modal-body .row > [class*="col-"] {
-            margin-bottom: 10px;
+            margin-bottom: 8px !important;
           }
           
-          /* Stats cards */
+          /* Stats cards on mobile */
           .glass-card .p-4 {
-            padding: 20px !important;
+            padding: 12px 10px !important;
           }
           
           .glass-card h3 {
-            font-size: 1.8rem !important;
+            font-size: 1.35rem !important;
+            margin: 2px 0 !important;
+          }
+
+          .glass-card p {
+            font-size: 0.75rem !important;
+            margin-bottom: 2px !important;
+            line-height: 1.1 !important;
+          }
+
+          .glass-card small {
+            font-size: 0.68rem !important;
           }
           
           .glass-card .d-flex .d-flex {
-            width: 45px;
-            height: 45px;
+            width: 36px !important;
+            height: 36px !important;
+            border-radius: 10px !important;
+            flex-shrink: 0 !important;
+          }
+
+          .glass-card .d-flex .d-flex svg {
+            width: 18px !important;
+            height: 18px !important;
           }
           
           /* Background toggle button position */
           .bg-toggle {
-            bottom: 20px;
-            right: 20px;
-            width: 40px;
-            height: 40px;
+            bottom: 16px !important;
+            right: 16px !important;
+            width: 38px !important;
+            height: 38px !important;
           }
         }
         
@@ -995,6 +1212,24 @@ const Clients = () => {
           }
         }
         
+        /* Desktop styles (min-width: 1025px) */
+        @media (min-width: 1025px) {
+          .control-bar {
+            flex-wrap: nowrap;
+          }
+          .search-input-wrap {
+            width: 320px;
+          }
+          .client-counter {
+            margin-left: auto;
+            margin-right: 20px;
+          }
+          .btn-add-modern {
+            margin-left: 0;
+            width: 160px;
+          }
+        }
+
         /* Small desktop adjustments */
         @media (min-width: 1025px) and (max-width: 1366px) {
           .modern-search {
@@ -1008,25 +1243,31 @@ const Clients = () => {
         
         /* Extra small devices */
         @media (max-width: 480px) {
+          .modern-clients-container > div:not(.animated-bg),
+          .clients-content-wrap {
+            padding: 8px 4px 60px 4px !important;
+          }
+
           .modern-table-container {
-            padding: 15px 12px;
+            padding: 10px 6px !important;
           }
           
           .control-bar {
-            padding: 15px;
+            padding: 10px !important;
           }
           
           .btn-add-modern {
-            font-size: 0.85rem;
+            font-size: 0.9rem !important;
+            padding: 10px !important;
           }
           
           .badge-modern {
-            padding: 4px 10px;
+            padding: 4px 8px;
             font-size: 0.7rem;
           }
           
           .glass-card h3 {
-            font-size: 1.5rem !important;
+            font-size: 1.4rem !important;
           }
           
           .glass-card p {
@@ -1038,11 +1279,11 @@ const Clients = () => {
           }
           
           .modal-header-gradient {
-            padding: 12px 16px;
+            padding: 12px 14px;
           }
           
           .form-control-modern {
-            padding: 8px 12px;
+            padding: 8px 10px;
             font-size: 0.85rem;
           }
         }
@@ -1073,7 +1314,7 @@ const Clients = () => {
       
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
       
-      <div style={{ marginLeft: '0', padding: '30px', position: 'relative', zIndex: 1 }} className="fade-in">
+      <div style={{ marginLeft: '0', padding: '30px', position: 'relative', zIndex: 1 }} className="clients-content-wrap fade-in">
         <Container fluid>
           {/* Alert */}
           {alert.show && (
@@ -1095,9 +1336,9 @@ const Clients = () => {
             </Alert>
           )}
 
-          {/* Stats Cards - responsive grid */}
-          <Row className="g-4 mb-4">
-            <Col xs={12} sm={6} lg={4} className="stat-card-enter" style={{ animationDelay: '0.1s' }}>
+          {/* Stats Cards - responsive grid: Card 1 & 2 in same row, Card 3 below on mobile */}
+          <Row className="g-2 g-md-4 mb-4">
+            <Col xs={6} sm={6} lg={4} className="stat-card-enter" style={{ animationDelay: '0.1s' }}>
               <Card 
                 className="glass-card h-100" 
                 style={{ borderRadius: '24px', border: 'none', cursor: 'pointer' }}
@@ -1137,7 +1378,7 @@ const Clients = () => {
               </Card>
             </Col>
             
-            <Col xs={12} sm={6} lg={4} className="stat-card-enter" style={{ animationDelay: '0.2s' }}>
+            <Col xs={6} sm={6} lg={4} className="stat-card-enter" style={{ animationDelay: '0.2s' }}>
               <Card 
                 className="glass-card h-100" 
                 style={{ borderRadius: '24px', border: 'none', cursor: 'pointer' }}
@@ -1175,7 +1416,7 @@ const Clients = () => {
               </Card>
             </Col>
             
-            <Col xs={12} sm={6} lg={4} className="stat-card-enter" style={{ animationDelay: '0.3s' }}>
+            <Col xs={12} sm={12} lg={4} className="stat-card-enter" style={{ animationDelay: '0.3s' }}>
               <Card 
                 className="glass-card h-100" 
                 style={{ borderRadius: '24px', border: 'none', cursor: 'pointer' }}
@@ -1193,8 +1434,8 @@ const Clients = () => {
                         fontSize: '2.5rem',
                         margin: 0 
                       }}>{pendingCount}</h3>
-                      <small style={{ color: '#f59e0b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <span style={{ fontSize: '1.2rem' }}>₹</span> {pendingAmount}
+                      <small style={{ color: '#f59e0b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }} title={`₹${Number(pendingAmount || 0).toLocaleString('en-IN')}`}>
+                        <span style={{ fontSize: '1.2rem' }}>₹</span> {formatAmount(pendingAmount)}
                       </small>
                     </div>
                   </div>
@@ -1220,36 +1461,43 @@ const Clients = () => {
             
             {/* Unified Control Bar */}
             <div className="control-bar mb-4">
-              <div className="search-icon-wrapper">
-                <Icons.Search />
-              </div>
-              
-              <Form.Control 
-                type="text"
-                placeholder="Search by name, ID or mobile..." 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="modern-search"
-              />
+              {/* Row 1: Search bar & Date filter in same row */}
+              <div className="control-bar-row control-bar-row-inputs">
+                <div className="search-input-wrap">
+                  <div className="search-icon-wrapper">
+                    <Icons.Search />
+                  </div>
+                  <Form.Control 
+                    type="text"
+                    placeholder="Search by name, ID or mobile..." 
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="modern-search"
+                  />
+                </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'white' }}>
-                <Icons.Filter />
-                <Form.Control 
-                  type="date" 
-                  value={dateFilter}
-                  onChange={(e) => setDateFilter(e.target.value)}
-                  className="modern-date-filter"
-                />
+                <div className="date-filter-wrap">
+                  <Icons.Filter />
+                  <Form.Control 
+                    type="date" 
+                    value={dateFilter}
+                    onChange={(e) => setDateFilter(e.target.value)}
+                    className="modern-date-filter"
+                  />
+                </div>
               </div>
 
-              <div className="client-counter" style={{ marginLeft: 'auto', marginRight: '50px' }}>
-                <span style={{ fontSize: '0.85rem', opacity: 0.9 }}>Total Patients</span>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800 }}>{filteredClients.length}</div>
-              </div>
+              {/* Row 2: Total patient counter & Add patient button in same row */}
+              <div className="control-bar-row control-bar-row-actions">
+                <div className="client-counter">
+                  <span style={{ opacity: 0.9 }}>Total Patients</span>
+                  <div style={{ fontWeight: 800 }}>{filteredClients.length}</div>
+                </div>
 
-              <button className="btn-add-modern" onClick={handleOpenAddModal} style={{ marginLeft: '-60px',width: '150px' }}>
-                <Icons.Plus /> Add Patients
-              </button>
+                <button className="btn-add-modern" onClick={handleOpenAddModal}>
+                  <Icons.Plus /> Add Patients
+                </button>
+              </div>
             </div>
 
             {/* Table - responsive wrapper */}
@@ -1300,7 +1548,7 @@ const Clients = () => {
                           {client.category}
                         </span>
                       </td>
-                      <td style={{ fontWeight: 600, color: client.balance > 0 ? '#dc2626' : '#059669' }}>₹{client.balance || 0}</td>
+                      <td style={{ fontWeight: 600, color: client.balance > 0 ? '#dc2626' : '#059669' }} title={`₹${Number(client.balance || 0).toLocaleString('en-IN')}`}>₹{formatAmount(client.balance || 0)}</td>
                       <td style={{ fontWeight: 500, color: '#475569' }}>{client.lastVisit}</td>
                       <td>
                         <div className="d-flex justify-content-center gap-2">
@@ -1970,19 +2218,19 @@ const Clients = () => {
                                 <div style={{ fontWeight: 600, color: '#1e293b', fontSize: '0.95rem', marginBottom: '10px' }}>{v.treatment}</div>
                                 
                                 <div style={{ fontSize: '0.8rem', color: '#0077b6', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px', marginTop: '8px' }}>💰 Fee</div>
-                                <div style={{ fontWeight: 700, color: '#059669', fontSize: '1.1rem' }}>₹{v.fee || '0'}</div>
+                                <div style={{ fontWeight: 700, color: '#059669', fontSize: '1.1rem' }} title={`₹${Number(v.fee || 0).toLocaleString('en-IN')}`}>₹{formatAmount(v.fee || '0')}</div>
 
                                 {v.receivedAmount && (
                                   <>
                                     <div style={{ fontSize: '0.8rem', color: '#0077b6', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px', marginTop: '8px' }}>💵 Received</div>
-                                    <div style={{ fontWeight: 700, color: '#059669', fontSize: '1rem' }}>₹{v.receivedAmount}</div>
+                                    <div style={{ fontWeight: 700, color: '#059669', fontSize: '1rem' }} title={`₹${Number(v.receivedAmount || 0).toLocaleString('en-IN')}`}>₹{formatAmount(v.receivedAmount)}</div>
                                   </>
                                 )}
 
                                 {v.balance && (
                                   <>
                                     <div style={{ fontSize: '0.8rem', color: '#0077b6', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px', marginTop: '8px' }}>⚖️ Balance</div>
-                                    <div style={{ fontWeight: 700, color: v.balance > 0 ? '#dc2626' : '#059669', fontSize: '1rem' }}>₹{v.balance}</div>
+                                    <div style={{ fontWeight: 700, color: v.balance > 0 ? '#dc2626' : '#059669', fontSize: '1rem' }} title={`₹${Number(v.balance || 0).toLocaleString('en-IN')}`}>₹{formatAmount(v.balance)}</div>
                                   </>
                                 )}
 

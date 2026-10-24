@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="dentalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0077b6"/>
+      <stop offset="100%" stop-color="#00b4d8"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#dentalGrad)"/>
+  <!-- Modern Clean Tooth Symbol -->
+  <path d="M 32 14 C 27 14, 20 15, 17 21 C 14 27, 16 35, 19 41 C 22 47, 24 53, 26 53 C 28 53, 29 45, 32 40 C 35 45, 36 53, 38 53 C 40 53, 42 47, 45 41 C 48 35, 50 27, 47 21 C 44 15, 37 14, 32 14 Z" fill="#ffffff"/>
+  <!-- Gloss Sheen -->
+  <path d="M 24 21 C 27 19, 31 19, 33 20 C 31 21, 28 23, 26 26 C 24 29, 23 34, 24 38 C 22 35, 21 29, 22 25 C 22.5 23, 23.2 21.8, 24 21 Z" fill="rgba(0, 119, 182, 0.25)"/>
+  <!-- Plus / Sparkle -->
+  <circle cx="46" cy="18" r="3.5" fill="#38ef7d"/>
+  <path d="M 46 13 L 46 23 M 41 18 L 51 18" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
+</svg>

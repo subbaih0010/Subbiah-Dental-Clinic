@@ -669,6 +669,17 @@ const Prescription = () => {
           to { opacity: 1; transform: translateY(0); }
         }
 
+        /* Top Clinic Banner */
+        .prescription-top-banner {
+          background: rgba(255, 255, 255, 0.88);
+          backdrop-filter: blur(16px);
+          border: 1px solid rgba(255, 255, 255, 0.6);
+          border-radius: 20px;
+          padding: 16px 22px;
+          box-shadow: 0 4px 20px rgba(0, 119, 182, 0.08);
+          animation: slideDown 0.5s ease-out;
+        }
+
         /* Search Section */
         .search-section {
           background: linear-gradient(180deg, #0077b6 0%, #00b4d8 100%);
@@ -677,17 +688,25 @@ const Prescription = () => {
           box-shadow: 0 10px 40px rgba(0, 119, 182, 0.3);
           animation: slideDown 0.6s ease-out;
           position: relative;
-          overflow: visible;
         }
 
-        .search-section::before {
+        .search-section-shimmer {
+          position: absolute;
+          inset: 0;
+          border-radius: 24px;
+          overflow: hidden;
+          pointer-events: none;
+          z-index: 0;
+        }
+
+        .search-section-shimmer::before {
           content: '';
           position: absolute;
           top: -50%;
           left: -50%;
           width: 200%;
           height: 200%;
-          background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
           animation: rotate 20s linear infinite;
         }
 
@@ -1135,88 +1154,129 @@ const Prescription = () => {
         }
 
         /* Responsive Styles - Mobile First Approach */
-        @media (max-width: 576px) {
+        @media (max-width: 768px) {
           .prescription-container {
-            overflow-x: auto;
+            overflow-x: hidden !important;
+            width: 100% !important;
+            max-width: 100vw !important;
+            box-sizing: border-box !important;
+          }
+
+          .prescription-container .container-fluid {
+            padding-left: 4px !important;
+            padding-right: 4px !important;
+            margin: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow-x: hidden !important;
+          }
+
+          .prescription-top-banner {
+            padding: 12px 14px !important;
+            border-radius: 16px !important;
+            margin-bottom: 12px !important;
           }
           
           .search-section {
-            padding: 20px 15px;
-            margin: 29px 12px 10px 12px !important;
-            border-radius: 20px;
+            padding: 18px 14px !important;
+            margin: 0 0 16px 0 !important;
+            border-radius: 18px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+          }
+
+          .search-section-shimmer {
+            border-radius: 18px !important;
           }
           
           .modern-search {
-            padding: 12px 16px;
-            font-size: 0.9rem;
+            padding: 12px 14px !important;
+            font-size: 0.9rem !important;
           }
           
           .glass-card {
-            margin: 0 12px 20px 12px;
-            border-radius: 20px;
+            margin: 0 0 16px 0 !important;
+            border-radius: 18px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
           }
           
           .card-body {
-            padding: 20px 16px !important;
+            padding: 16px 12px !important;
           }
           
           .patient-avatar {
-            width: 70px;
-            height: 70px;
-            font-size: 2rem;
+            width: 70px !important;
+            height: 70px !important;
+            font-size: 2rem !important;
           }
           
           .info-label, .info-value {
-            font-size: 0.85rem;
+            font-size: 0.85rem !important;
           }
           
           .section-header-modern {
-            font-size: 1rem;
-            margin-bottom: 15px;
+            font-size: 1rem !important;
+            margin-bottom: 12px !important;
           }
           
           .visit-item-modern {
-            padding: 15px;
-            margin-bottom: 12px;
+            padding: 14px 12px !important;
+            margin-bottom: 10px !important;
+          }
+
+          .visit-item-modern:hover {
+            transform: none !important;
+          }
+          
+          .info-row-modern:hover {
+            margin: 0 !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+          }
+
+          .visit-item-modern .d-flex.flex-row {
+            flex-wrap: wrap !important;
           }
           
           .btn-save-modern, .btn-print-modern {
-            padding: 12px 20px;
-            font-size: 0.9rem;
+            padding: 12px 16px !important;
+            font-size: 0.9rem !important;
           }
           
           .bg-toggle {
-            bottom: 20px;
-            right: 20px;
-            width: 48px;
-            height: 48px;
+            bottom: 16px !important;
+            right: 16px !important;
+            width: 40px !important;
+            height: 40px !important;
           }
           
           .form-control-modern {
-            font-size: 0.9rem;
-            padding: 10px 14px;
+            font-size: 0.9rem !important;
+            padding: 10px 12px !important;
           }
           
           .search-results-modern {
-            max-height: 300px;
+            max-height: 280px !important;
+            border-radius: 16px !important;
           }
           
           .search-result-item {
-            padding: 15px;
+            padding: 12px 14px !important;
           }
-          
+
           .empty-state-icon {
-            width: 80px;
-            height: 80px;
-            font-size: 2rem;
+            width: 80px !important;
+            height: 80px !important;
+            font-size: 2rem !important;
           }
           
           .empty-state h3 {
-            font-size: 1.3rem;
+            font-size: 1.3rem !important;
           }
           
           .empty-state p {
-            font-size: 0.9rem;
+            font-size: 0.9rem !important;
           }
         }
 
@@ -1315,6 +1375,58 @@ const Prescription = () => {
       
       <div style={{ marginLeft: '0', padding: '15px 0 30px 0', position: 'relative', zIndex: 1 }}>
         <Container fluid>
+          {/* Attractive Top Clinic Banner */}
+          <div className="prescription-top-banner mb-4">
+            <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
+              <div className="d-flex align-items-center gap-3">
+                <div style={{
+                  width: '46px',
+                  height: '46px',
+                  borderRadius: '14px',
+                  background: 'linear-gradient(135deg, #0077b6 0%, #00b4d8 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontSize: '1.4rem',
+                  boxShadow: '0 4px 16px rgba(0, 119, 182, 0.3)'
+                }}>
+                  🦷
+                </div>
+                <div>
+                  <h4 style={{ 
+                    margin: 0, 
+                    fontWeight: 800, 
+                    background: 'linear-gradient(135deg, #0077b6 0%, #00b4d8 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    fontSize: 'clamp(1.2rem, 4vw, 1.6rem)' 
+                  }}>
+                    Subbiah Dental Clinic
+                  </h4>
+                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem', fontWeight: 600 }}>
+                    Prescription & Treatment Portal • Dr. Subbiah, BDS
+                  </p>
+                </div>
+              </div>
+              <div style={{
+                background: 'rgba(255, 255, 255, 0.9)',
+                border: '1.5px solid rgba(0, 119, 182, 0.25)',
+                padding: '6px 14px',
+                borderRadius: '20px',
+                color: '#0077b6',
+                fontWeight: 700,
+                fontSize: '0.82rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: '0 2px 10px rgba(0, 119, 182, 0.1)'
+              }}>
+                <Icons.Sparkles /> Patient Care
+              </div>
+            </div>
+          </div>
+
           {/* Alert */}
           {alert.show && (
             <Alert 
@@ -1323,7 +1435,7 @@ const Prescription = () => {
               onClose={() => setAlert({ show: false })} 
               dismissible
               style={{
-                margin: '0 12px 20px 12px',
+                margin: '0 0 20px 0',
                 background: alert.type === 'success' ? 'linear-gradient(180deg, #0077b6 0%, #00b4d8 100%)' : 
                            alert.type === 'danger' ? 'linear-gradient(180deg, #dc3545 0%, #ff6b6b 100%)' : '#0077b6',
                 color: 'white'
@@ -1338,6 +1450,7 @@ const Prescription = () => {
 
           {/* Client Search Section */}
           <div className="search-section mb-4">
+            <div className="search-section-shimmer" />
             <h5 style={{ color: 'white', fontWeight: 700, marginBottom: '20px', fontSize: 'clamp(1rem, 5vw, 1.3rem)', position: 'relative', zIndex: 10 }}>
               <Icons.Stethoscope /> Select Patient
             </h5>

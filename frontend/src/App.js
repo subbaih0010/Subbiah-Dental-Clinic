@@ -22,6 +22,7 @@ function AppContent() {
   const [touchStartX, setTouchStartX] = useState(0);
 
   useEffect(() => {
+    document.title = "Subbiah Dental Clinic";
     function handleResize() {
       const width = window.innerWidth;
       const mobile = width < 768;
@@ -109,30 +110,33 @@ function AppContent() {
     top: 0,
     left: 0,
     right: 0,
-    height: 60,
+    height: 64,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: '0 16px',
-    background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+    background: 'linear-gradient(135deg, #0077b6 0%, #0096c7 50%, #00b4d8 100%)',
     zIndex: 950,
-    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-    borderBottom: '1px solid rgba(0,0,0,0.05)'
+    boxShadow: '0 4px 20px rgba(0, 119, 182, 0.25)',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.2)'
   };
 
   const menuButtonStyle = {
-    fontSize: 24,
+    fontSize: 22,
     border: 'none',
-    background: 'transparent',
+    background: 'rgba(255, 255, 255, 0.2)',
+    backdropFilter: 'blur(8px)',
     cursor: 'pointer',
-    padding: '8px',
-    borderRadius: '8px',
+    padding: '6px',
+    borderRadius: '12px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    transition: 'background-color 0.2s',
+    color: '#ffffff',
+    transition: 'all 0.2s ease',
     width: 40,
-    height: 40
+    height: 40,
+    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
   };
 
   const overlayStyle = {
@@ -162,7 +166,10 @@ function AppContent() {
           }
           @media (max-width: 767px) {
             .p-4 {
-              padding: 16px !important;
+              padding-top: 76px !important;
+              padding-bottom: 24px !important;
+              padding-left: 6px !important;
+              padding-right: 6px !important;
             }
           }
           @media (min-width: 768px) and (max-width: 1023px) {
@@ -185,15 +192,76 @@ function AppContent() {
             onClick={() => setSidebarOpen(true)} 
             aria-label="Open menu" 
             style={menuButtonStyle}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.05)'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.3)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.2)'}
           >
             ☰
           </button>
-          <div style={{ fontWeight: 900, fontSize: 18, color: '#42a1ff',fontFamily: 'verdana' }}>
-            🦷 Subbiah Dental Clinic
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              width: 36,
+              height: 36,
+              borderRadius: '10px',
+              background: 'rgba(255, 255, 255, 0.22)',
+              backdropFilter: 'blur(8px)',
+              border: '1.5px solid rgba(255, 255, 255, 0.4)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '18px',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+            }}>
+              🦷
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{
+                fontWeight: 800,
+                fontSize: '15px',
+                color: '#ffffff',
+                fontFamily: "'Inter', sans-serif",
+                letterSpacing: '0.6px',
+                lineHeight: 1.2,
+                textShadow: '0 1px 3px rgba(0,0,0,0.2)'
+              }}>
+                SUBBIAH DENTAL
+              </span>
+              <span style={{
+                fontSize: '9.5px',
+                color: 'rgba(255, 255, 255, 0.9)',
+                fontWeight: 600,
+                letterSpacing: '1.2px',
+                textTransform: 'uppercase',
+                lineHeight: 1
+              }}>
+                Clinic & Implant Centre
+              </span>
+            </div>
           </div>
-          <div style={{ width: 40 }}></div> {/* Spacer for alignment */}
+
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px',
+            background: 'rgba(255, 255, 255, 0.18)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+            padding: '4px 8px',
+            borderRadius: '16px',
+            color: 'white'
+          }}>
+            <span style={{
+              width: 7,
+              height: 7,
+              borderRadius: '50%',
+              backgroundColor: '#10b981',
+              boxShadow: '0 0 6px #10b981',
+              display: 'inline-block'
+            }} />
+            <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.5px' }}>
+              ONLINE
+            </span>
+          </div>
         </div>
       )}
 
