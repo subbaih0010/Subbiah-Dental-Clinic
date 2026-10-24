@@ -19,14 +19,24 @@ const DentalLogin = () => {
   const VALID_USERNAME = 'Subbiah';
   const VALID_PASSWORD = '$Ubbu@1786';
 
-  // Load saved credentials on mount
+  const navigate = useNavigate();
+
+  // Load saved credentials and check daily session on mount
   useEffect(() => {
+    const today = new Date().toDateString();
+    const isLoggedIn = localStorage.getItem('dentalLoggedIn') === 'true';
+    const sessionDate = localStorage.getItem('dentalSessionDate');
+    if (isLoggedIn && sessionDate === today) {
+      navigate('/dashboard', { replace: true });
+      return;
+    }
+
     const savedUser = localStorage.getItem('dentalUsername');
     if (savedUser) {
       setUsername(savedUser);
       setRememberMe(true);
     }
-  }, []);
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,12 +54,18 @@ const DentalLogin = () => {
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     if (username === VALID_USERNAME && password === VALID_PASSWORD) {
+      const today = new Date().toDateString();
+      localStorage.setItem('dentalLoggedIn', 'true');
+      localStorage.setItem('dentalSessionDate', today);
       if (rememberMe) {
         localStorage.setItem('dentalUsername', username);
       } else {
         localStorage.removeItem('dentalUsername');
       }
       setShowSuccess(true);
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1000);
     } else {
       setError('Invalid username or password');
       triggerShake();
@@ -63,8 +79,6 @@ const DentalLogin = () => {
     setShake(true);
     setTimeout(() => setShake(false), 500);
   };
-
-  const navigate = useNavigate();
 
   const enterDashboard = () => {
     // navigation to dashboard handled via react-router

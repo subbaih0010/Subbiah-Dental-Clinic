@@ -11,6 +11,18 @@ import DentalLogin from './components/Login';
 // import Appointments from './components/Appointments';
 // import Settings from './components/Settings';
 
+// Check if user is logged in for the current day
+export const isUserLoggedInToday = () => {
+  try {
+    const isLoggedIn = localStorage.getItem('dentalLoggedIn') === 'true';
+    const sessionDate = localStorage.getItem('dentalSessionDate');
+    const today = new Date().toDateString();
+    return isLoggedIn && sessionDate === today;
+  } catch (e) {
+    return false;
+  }
+};
+
 function AppContent() {
   const location = useLocation();
   const hideSidebar = location.pathname === '/login';
@@ -283,8 +295,8 @@ function AppContent() {
       {/* Main content area */}
       <div style={contentStyle} className="flex-grow-1 p-4">
         <Routes>
-          <Route path="/" element={<Navigate to="/login" />} />
-          <Route path="/login" element={<DentalLogin />} />
+          <Route path="/" element={isUserLoggedInToday() ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />} />
+          <Route path="/login" element={isUserLoggedInToday() ? <Navigate to="/dashboard" replace /> : <DentalLogin />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/clients" element={<Clients />} />
           <Route path="/prescription" element={<Prescription />} />

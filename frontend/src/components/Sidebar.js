@@ -8,6 +8,16 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
 
   const user = { name: 'Dr. Subbiah', role: 'Administrator' };
 
+  const handleLogout = () => {
+    try {
+      localStorage.removeItem('dentalLoggedIn');
+      localStorage.removeItem('dentalSessionDate');
+    } catch (e) {
+      console.error(e);
+    }
+    window.location.href = '/login';
+  };
+
   const styles = {
     sidebar: {
       background: 'linear-gradient(180deg, #0077b6 0%, #00b4d8 100%)',
@@ -131,22 +141,48 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
       </Nav>
 
       <div style={styles.userArea}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            background: 'rgba(255,255,255,0.2)',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-            <Icons.User />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              background: 'rgba(255,255,255,0.2)',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+              <Icons.User />
+            </div>
+            <div>
+              <div style={{ fontSize: '0.9rem', fontWeight: 500 }}>{user.name}</div>
+              <div style={{ fontSize: '0.75rem', opacity: 0.7 }}>{user.role}</div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: '0.9rem', fontWeight: 500 }}>{user.name}</div>
-            <div style={{ fontSize: '0.75rem', opacity: 0.7 }}>{user.role}</div>
-          </div>
+          <button
+            onClick={handleLogout}
+            title="Log Out"
+            style={{
+              background: 'rgba(255,255,255,0.18)',
+              border: '1px solid rgba(255,255,255,0.3)',
+              borderRadius: '8px',
+              color: 'white',
+              padding: '6px 8px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s ease',
+              minWidth: '32px',
+              minHeight: '32px'
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
